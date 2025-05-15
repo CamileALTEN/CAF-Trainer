@@ -1,0 +1,88 @@
+.admin-page {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+      .admin-page h1 {
+        margin: 16px;
+        color: #043962;
+      }
+      .admin-main {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+      }
+      .admin-tree {
+        width: 280px;
+        background: #f0f4f8;
+        padding: 16px;
+        overflow-y: auto;
+        border-right: 1px solid #ccc;
+        display: flex;
+        flex-direction: column;
+      }
+      .admin-tree > button {
+        margin-bottom: 12px;
+      }
+      .admin-node {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 8px;
+        width: 100%;
+        cursor: pointer;
+      }
+      .admin-node span {
+        flex: 1;
+      }
+      .admin-node span.selected {
+        font-weight: bold;
+        color: #008BD2;
+      }
+      .admin-editor {
+        flex: 1;
+        padding: 24px;
+        overflow-y: auto;
+      }
+      .form-group {
+        margin-bottom: 16px;
+      }
+      .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 4px;
+      }
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #bbb;
+        border-radius: 4px;
+        font-family: inherit;
+      }
+      .link-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .save-btn {
+        background-color: #008BD2;
+        color: white;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .save-btn:hover {
+        background-color: #006fa1;
+      }
+      /* Ajuste la hauteur minimale de l’éditeur Quill */
+      .ql-container {
+        min-height: 200px;
+      }
+      .form-group .ql-toolbar {
+        border-radius: 4px 4px 0 0;
+      }
+      .form-group .ql-container {
+        border-radius: 0 0 4px 4px;
+      }

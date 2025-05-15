@@ -1,0 +1,93 @@
+/* client/src/pages/HomePage.css
+   ─────────────────────────────────────────────────────────── */
+
+/* ========== disposition générale ========== */
+.home {
+  padding: 2rem 1rem;
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
+.home h1 {
+  font-size: 1.9rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ========== barre globale ========== */
+.overall-progress .progress-bar {
+  height: 14px;                   /* + haute que les sous‑barres */
+  border-radius: 7px;
+  background: #e3f2fd;            /* bleu très clair */
+  overflow: hidden;
+}
+
+.overall-progress .progress {
+  background: #2196f3;            /* bleu principal */
+}
+
+/* ========== grille des cartes ========== */
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* ========== carte module ========== */
+.module-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .05);
+  transition: transform .2s ease;
+}
+
+.module-card:hover {
+  transform: translateY(-3px);
+}
+
+.module-title {
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+.summary {
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #444;
+  flex-grow: 1;                   /* pousse le bouton vers le bas */
+}
+
+/* ========== barre de progression module ========== */
+.module-progress .progress-bar {
+  height: 15px;
+  border-radius: 4px;
+  background: #e8eaf5;           /* vert très clair */
+  overflow: hidden;
+}
+
+.module-progress .progress {
+  background: #26a69a;           /* vert principal */
+}
+
+/* ========== bouton d’accès ========== */
+.module-btn {
+  align-self: flex-start;
+  display: inline-block;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: .5rem 1rem;
+  border-radius: 4px;
+  background: #2196f3;
+  color: #fff;
+  transition: background .2s ease;
+}
+
+.module-btn:hover {
+  background: #1976d2;
+}

@@ -1,0 +1,21 @@
+{      
+      "modules": [
+        {
+          "id": "prerequis",
+          "title": "Prérequis CAF",
+          "available": true,
+          "items": [
+            {
+              "id": "intro",
+              "title": "Introduction",
+              "subtitle": "Présentation",
+              "content": "<p>Bienvenue !</p>",
+              "links": [],
+              "images": [],
+              "videos": [],
+              "children": []
+            }
+          ]
+        }
+      ]
+    }

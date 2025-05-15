@@ -1,0 +1,58 @@
+             .item-content {
+                     padding: 16px;
+                     background: #fff;
+                     border-radius: 8px;
+                     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                     margin: 16px 0;
+                   }
+                   .item-header {
+                     display: flex;
+                     justify-content: space-between;
+                     align-items: center;
+                     margin-bottom: 16px;
+                   }
+                   .item-titles h1 {
+                     margin: 0;
+                     font-size: 24px;
+                     word-break: break-word;
+                   }
+                   .item-titles h3 {
+                     margin: 4px 0 0;
+                     color: #043962;
+                     font-weight: normal;
+                   }
+                   .item-actions {
+                     display: flex;
+                     align-items: center;
+                     gap: 12px;
+                   }
+                   .check-button {
+                     background: none;
+                     border: none;
+                     cursor: pointer;
+                     padding: 4px;
+                     display: flex;
+                     align-items: center;
+                     color: #0870e7;
+                   }
+                   .check-button svg {
+                     font-size: 24px;
+                     transition: opacity .2s;
+                   }
+                   .check-button svg.unchecked { opacity: .5; }
+                   .check-button:hover svg,
+                   .check-button svg.checked { opacity: 1; }
+                   .item-body {
+                     margin-top: 16px;
+                   }
+                   .item-html p {
+                     line-height: 1.5;
+                     color: #333;
+                   }
+                 /* -------- liens -------- */
+                 .item-links          { margin-top: 20px; }
+                 .item-links h3       { margin: 0 0 8px;  font-size: 1rem; color: #043962; }
+                 .item-links ul       { list-style: none; padding: 0; }
+                 .item-links li       { margin: 4px 0;   font-size: .92rem; }
+                 .item-links a        { color: #008BD2;  text-decoration: none; }
+                 .item-links a:hover  { text-decoration: underline; }

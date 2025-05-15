@@ -1,0 +1,112 @@
+[
+{
+    "id": "module-1",
+    "title": "Introduction au CAF",
+    "description": "<p>...</p>",
+    "items": [
+    {
+        "id": "item-1",
+        "title": "Qu'est-ce que le CAF",
+        "subtitle": "Définitions clés 123",
+        "content": "<p>Test 123 <strong>TEST <u>TEST </u>  </strong></p><p><br></p><p>retour à la ligne</p><p><br></p><h1>heading 1  </h1><p><br></p> <p><br></p><ol><li>oui</li><li>non</li></ol><ul><li>bulet point 1</li><li>12</li></ul>",
+        "links": [
+        {
+            "title": "Site officiel",
+            "url": "https://www.google.com",
+            "label": "Google"
+        }
+        ],
+        "images": [
+        {
+            "src": "https://freefrontend.com//assets/img/css-sidebar-menus/thumb.png",
+            "width": 25,
+            "align": "center"
+        }
+        ],
+        "videos": [],
+        "profiles": [
+        "Nantes",
+        "Montoir"
+        ],
+        "enabled": true,
+        "children": [
+        {
+            "id": "60f65965-ef9e-4541-8086-2569210ddab2",
+            "title": "test2",
+            "subtitle": "",
+            "content": "",
+            "links": [
+            {
+                "label": "Livret d'accueil",
+                "url": "https://www.google.com"
+            }
+            ],
+            "images": [],
+            "videos": [],
+            "profiles": [],
+            "enabled": true,
+            "children": []
+        }
+        ]
+    },
+    {
+        "id": "1746552185431",
+        "title": "Test",
+        "subtitle": "",
+        "content": "",
+        "links": [],
+        "images": [],
+        "videos": [],
+        "profiles": [],
+        "enabled": true,
+        "children": []
+    }
+    ],
+    "enabled": true,
+    "summary": "Ceci est une description"
+},
+{
+    "id": "1746553317746",
+    "title": "Métier CAf",
+    "summary": "",
+    "enabled": true,
+    "items": [
+    {
+        "id": "95a19b03-e421-432b-a6ff-75a9d3691787",
+        "title": "test",
+        "subtitle": "",
+        "content": "",
+        "links": [],
+        "images": [],
+        "videos": [],
+        "profiles": [
+        "Nantes"
+        ],
+        "enabled": true,
+        "children": []
+    }
+    ]
+},
+{
+    "id": "1746639040310",
+    "title": "Montée en compétences",
+    "summary": "",
+    "enabled": true,
+    "items": [
+    {
+        "id": "f9394577-6ceb-4747-8717-c9e39c14eeb7",
+        "title": "Test",
+        "subtitle": "",
+        "content": "",
+        "links": [],
+        "images": [],
+        "videos": [],
+        "profiles": [
+        "Nantes"
+        ],
+        "enabled": true,
+        "children": []
+    }
+    ]
+}
+]

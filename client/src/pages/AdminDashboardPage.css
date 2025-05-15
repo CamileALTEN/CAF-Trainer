@@ -1,0 +1,81 @@
+       .admin-dashboard {
+               padding: 1.5rem;
+               margin: auto;
+               max-width: 960px;
+             }
+    
+             .admin-dashboard h1 {
+               text-align: center;
+               margin-bottom: 1rem;
+             }
+    
+             .admin-dashboard .cards {
+               display: flex;
+               gap: 1rem;
+               flex-wrap: wrap;
+               margin-bottom: 1.5rem;
+             }
+    
+             .admin-dashboard .card {
+               flex: 1 1 180px;
+               background: #f9f9f9;
+               padding: 1rem;
+               border-radius: 8px;
+               text-align: center;
+               box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
+             }
+    
+             .admin-dashboard .big {
+               font-size: 2rem;
+               font-weight: bold;
+               color: #008BD2;
+               margin-top: .5rem;
+             }
+    
+             /* ---- CENTRAGE DES BOUTONS APRÈS LES STATS ---- */
+             .admin-dashboard .quick {
+               margin-bottom: 1.5rem;
+               display: flex;
+               justify-content: center;  /* ici centré */
+               gap: 1rem;
+               flex-wrap: wrap;
+             }
+    
+             .admin-dashboard .quick button {
+               background: #008bd2;
+               color: #fff;
+               border: none;
+               padding: .5rem 1rem;
+               border-radius: 4px;
+             }
+    
+             .admin-dashboard .quick button:hover {
+               background: #006fa1;
+             }
+    
+             .admin-dashboard table {
+               width: 100%;
+               border-collapse: collapse;
+             }
+    
+             .admin-dashboard th,
+             .admin-dashboard td {
+               padding: .5rem .75rem;
+               border-bottom: 1px solid #e0e0e0;
+             }
+    
+             .admin-dashboard th {
+               background: #fafafa;
+               text-align: left;
+             }
+    
+             .admin-dashboard tbody tr:hover {
+               background: #f5fbff;
+             }
+    
+             .admin-dashboard button {
+               background: none;
+               border: none;
+               cursor: pointer;
+               font-size: 1.1rem;
+             }

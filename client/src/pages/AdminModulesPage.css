@@ -1,0 +1,135 @@
+/* -------- header -------------------------------------------------------- */
+.mods-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 32px;
+  background: #f4f8ff;
+  border-bottom: 1px solid #e4eaf2;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .05);
+}
+
+.mods-header .left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-back {
+  background: none;
+  border: none;
+  color: #043962;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 4px;
+  transition: background .15s;
+}
+
+.btn-back:hover      { background: #e9f2ff; }
+
+/* -------- grille des cartes -------------------------------------------- */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 28px;
+  padding: 32px;
+}
+
+.cards li {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  transition: transform .15s, box-shadow .15s;
+}
+
+.cards li:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .06);
+}
+
+.cards li.disabled {
+  opacity: .45;
+  filter: grayscale(.2);
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px 0;
+}
+
+.card-head h2 {
+  font-size: 1.1rem;
+  margin: 0;
+  word-break: break-word;
+}
+
+.toggle {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.summary {
+  flex: 1;
+  padding: 10px 20px;
+  font-size: .9rem;
+  color: #555;
+}
+
+footer {
+  padding: 14px 20px;
+  border-top: 1px solid #eee;
+  text-align: right;
+}
+
+/* -------- boutons ------------------------------------------------------- */
+.btn-primary,
+.btn-secondary {
+  background: #008bd2;
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  font-size: .95rem;
+  transition: background .15s;
+}
+
+.btn-primary:hover   { background: #006fa1; }
+
+.btn-secondary {
+  background: #043962;
+}
+
+.btn-secondary:hover { background: #032c59; }
+
+/* …(tout ce qui existait déjà)… */
+
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* bouton poubelle */
+.btn-delete {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: transform .15s, color .15s;
+  color: #c62828;
+}
+
+.btn-delete:hover {
+  transform: scale(1.15);
+  color: #a51212;
+}

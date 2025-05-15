@@ -1,0 +1,14 @@
+       {
+               "extends": "../tsconfig.json",
+               "compilerOptions": {
+                 "jsx": "react-jsx",
+                 "lib": ["DOM", "DOM.Iterable", "ESNext"],   // pour JSX, fetch, find, includes…
+                 "moduleResolution": "node",
+                 "esModuleInterop": true,
+                 "allowSyntheticDefaultImports": true,
+                 "skipLibCheck": true,
+                 "resolveJsonModule": true,                  // pour importer .json
+                 "isolatedModules": true
+               },
+               "include": ["src"]
+             }

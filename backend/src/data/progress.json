@@ -1,0 +1,19 @@
+[
+  {
+    "username": "logan",
+    "moduleId": "module-1",
+    "visited": []
+  },
+  {
+    "username": "user",
+    "moduleId": "module-1",
+    "visited": [
+      "item-1"
+    ]
+  },
+  {
+    "username": "logan",
+    "moduleId": "1746639040310",
+    "visited": []
+  }
+]

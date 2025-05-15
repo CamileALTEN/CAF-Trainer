@@ -1,0 +1,83 @@
+/* client/src/pages/ModulePage.css
+   ─────────────────────────────────────────────────────────── */
+
+/* conteneur principal */
+.module-page      { position:relative; height:calc(100vh - 64px); }
+
+/* -------- barre latérale (drawer) -------- */
+.module-sidebar   { position:fixed; top:64px; bottom:0; left:-300px;
+                    width:300px; background:#0f2140; color:#fff;
+                    display:flex; flex-direction:column;
+                    transition:left .25s ease; z-index:500; }
+.module-page.open .module-sidebar { left:0; }
+
+.module-sidebar header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:20px 5px; background:#0b1830; border-bottom:1px solid rgba(255,255,255,.08);
+}
+.module-sidebar h2{ margin:0; font-size:1rem; }
+.module-sidebar .close{
+  background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;
+}
+
+.module-sidebar nav{ flex:1; overflow-y:auto; padding:12px 8px; }
+
+ul.sidebar      { list-style:none; padding-left:0; margin:0; }
+ul.sidebar ul   { padding-left:14px; border-left:2px solid rgba(255,255,255,.15); }
+.menu-item      { margin:2px 0; }
+.menu-item>button{
+  background:none; border:none; width:100%; text-align:left;
+  padding:6px 10px; border-radius:4px;
+  color:#d5e3ff; font-size:.94rem; cursor:pointer;
+  transition:background .15s,color .15s;
+}
+.menu-item>button:hover              { background:rgba(255,255,255,.1); }
+.menu-item.active>button             { background:#008bd2; color:#fff; }
+.menu-item.visited>button:not(.active){ opacity:.55; }
+
+/* -------- contenu -------- */
+.module-content { height:calc(100vh - 64px); overflow-y:auto;
+                  padding:24px; background:#f9f9f9;  width: 100%;
+                  margin: 0 auto;}
+
+/* -------- bouton hamburger -------- */
+.toggle-sidebar{
+  position:fixed; bottom:24px; left:24px;
+  background:#008bd2; color:#fff; border:none; border-radius:50%;
+  width:48px; height:48px; font-size:1.4rem; cursor:pointer;
+  box-shadow:0 2px 6px rgba(0,0,0,.25); z-index:600;
+  transition:background .15s;
+}
+.toggle-sidebar:hover
+
+/* quand le panneau est ouvert on masque le hamburger */
+.module-page.open .toggle-sidebar{ display:none; }
+
+.btn-back,
+.close{ background:none; border:none; color:#fff; font-size:1rem; cursor:pointer; }
+/* flèches de navigation -------------------------------------------------- */
+.nav-arrow {
+  position: fixed;
+  bottom: 24px;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  cursor: pointer;
+  background: #008bd2;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.25);
+  z-index: 600;
+  transition: background .15s;
+}
+.nav-arrow:hover      { background:#006fa1; }
+.nav-arrow.prev       { left:  84px;  }   /* 24px + 60px (hamburger) */
+.nav-arrow.next       { right: 24px;  }
+.module-page.open .nav-arrow.prev { left: 24px; } /* quand le panneau est ouvert */
+
+ /* champ recherche & liste ------------------------------------------------ */
+.module-content input[type="search"] {
+  border:1px solid #bbb;
+  border-radius:4px;
+}

@@ -1,0 +1,23 @@
+.progress-bar {
+        position: relative;
+        background: #e0e0e0;
+        border-radius: 4px;
+        height: 20px;
+        margin: 8px 0;
+      }
+      .progress-bar-fill {
+        background: #0870e7;
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+      .progress-bar-text {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        line-height: 20px;
+        color: #043962;
+        font-weight: bold;
+      }

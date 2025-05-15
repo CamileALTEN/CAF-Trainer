@@ -1,0 +1,43 @@
+[
+                   {
+                     "id": "1746607838838",
+                     "username": "eline.castiglione@alten.com",
+                     "password": "$2b$08$S1UuW2Cv98yFwiT7HruPxOC/qxloCEgDmbQHKozx0ZOXwQrfpUypq",
+                     "role": "caf",
+                     "site": "Nantes",
+                     "managerId": "1746634331825"
+                   },
+                   {
+                     "id": "1746634331825",
+                     "username": "dylan",
+                     "password": "$2b$08$d9wiHryFBkzbJaLoJq9FWONXgLz.X1GChx4CYJyx5G3zpd12yPpKi",
+                     "role": "manager",
+                     "site": "Nantes"
+                   },
+                   {
+                     "id": "1746634829314",
+                     "username": "logan",
+                     "password": "$2b$08$9qrH.OwADfldwyPPd6UqaOah0gFEGob/Glhf4Pqp/w2HX3LVdcexG",
+                     "role": "caf",
+                     "site": "Nantes",
+                     "managerId": "1746634331825"
+                   },
+                   {
+                     "id": "1746787691930",
+                     "username": "camile.briard@alten.com",
+                     "password": "$2b$08$5ai3PYOJNejC8IIRBB347uDQce71PL5R.yCogTVapU4GKEZ22gR12",
+                     "role": "admin"
+                   },
+                   {
+                     "id": "1747039012242",
+                     "username": "carla.ledeux@alten.com",
+                     "password": "$2b$08$nMIUWTHlZqltpvDseNmH.O7WZnvOdKxig8wJ5WAKAwPCMcVDgNa.K",
+                     "role": "admin"
+                   },
+                   {
+                     "id": "1747126661704",
+                     "username": "francois.monier@alten.com",
+                     "password": "$2b$08$6mNSt/DFykkrOyeeW8/Oa.lpxMvjhcOfHh02W.8rlVIxH8d9GLAhG",
+                     "role": "admin"
+                   }
+                 ]

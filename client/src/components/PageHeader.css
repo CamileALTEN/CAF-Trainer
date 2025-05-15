@@ -1,0 +1,20 @@
+             /* client/src/components/PageHeader.css
+                (fichier complet) */
+                .page-header{
+                 display:flex;justify-content:space-between;align-items:center;
+                 background:#043962;color:#fff;padding:12px 24px;
+                 box-shadow:0 2px 4px rgba(0,0,0,.1);
+                 position:sticky;top:0;left:0;right:0;z-index:2000;
+               }
+               .header-left{display:flex;align-items:center;cursor:pointer}
+               .header-title{font-size:1.5rem;font-weight:bold;user-select:none}
+               .header-right{display:flex;align-items:center;gap:12px}
+               .header-user{font-size:.95rem}
+               .header-logout,
+               .header-favs{
+                 background:#fff;color:#043962;border:none;
+                 padding:6px 12px;border-radius:4px;font-size:.9rem;
+                 cursor:pointer;transition:background .2s;
+               }
+               .header-logout:hover,
+               .header-favs:hover{background:#f0f0f0}

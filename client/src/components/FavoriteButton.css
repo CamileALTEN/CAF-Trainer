@@ -1,0 +1,9 @@
+             .fav-button {
+                     background: none;
+                     border: none;
+                     cursor: pointer;
+                     padding: 4px;
+                   }
+                   .fav-button:hover svg {
+                     opacity: 0.8;
+                   }

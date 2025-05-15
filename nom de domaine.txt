@@ -1,0 +1,9 @@
+
+SMTP : ns0.ovh.net
+port : 25
+
+POP : ns0.ovh.net 
+Port : 110
+
+mail : services@conforea.fr
+mdp : Test2025!

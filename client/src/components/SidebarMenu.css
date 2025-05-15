@@ -1,0 +1,10 @@
+ul.sidebar      { list-style:none;padding-left:0;margin:0 }
+ul.sidebar ul   { padding-left:16px;border-left:2px solid #e0e0e0;margin:4px 0 }
+.menu-item      { margin:2px 0 }
+.menu-item>button{
+  background:none;border:none;width:100%;text-align:left;padding:4px 8px;border-radius:4px;
+  cursor:pointer;transition:background .15s;
+}
+.menu-item>button:hover             { background:#f0f8ff }
+.menu-item.active>button            { background:#008bd2;color:#fff }
+.menu-item.visited>button:not(.active) { opacity:.6 }
