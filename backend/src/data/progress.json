@@ -2,7 +2,9 @@
   {
     "username": "logan",
     "moduleId": "module-1",
-    "visited": []
+    "visited": [
+      "item-1"
+    ]
   },
   {
     "username": "user",
