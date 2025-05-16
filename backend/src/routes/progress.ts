@@ -1,43 +1,53 @@
-             import { Router } from 'express';
-             import { read, write } from '../config/dataStore';
-             import { IProgress }  from '../models/IProgress';
-             import { IUser }      from '../models/IUser';
-      
-             const router = Router();
-             const TABLE  = 'progress';
-      
-             /* GET /api/progress/:username   – lecture complète d’un CAF */
-             router.get('/:username', (req, res) => {
-               const rows = read<IProgress>(TABLE).filter(p => p.username === req.params.username);
-               res.json(rows);
-             });
-      
-             /* PATCH /api/progress   body:{ username,moduleId,visited } – MAJ 1 module */
-             router.patch('/', (req, res) => {
-               const { username, moduleId, visited } = req.body as IProgress;
-               if (!username || !moduleId) return res.status(400).json({error:'Données manquantes'});
-      
-               const list = read<IProgress>(TABLE);
-               const idx  = list.findIndex(p => p.username===username && p.moduleId===moduleId);
-      
-               if (idx === -1) list.push({ username, moduleId, visited });
-               else            list[idx].visited = visited;
-      
-               write(TABLE, list);
-               res.json({ ok:true });
-             });
-      
-             /* GET /api/progress?managerId=… – progression de tous les CAF d’un manager */
-             router.get('/', (req, res) => {
-               const { managerId } = req.query as { managerId?: string };
-               const rows = read<IProgress>(TABLE);
-               const users= read<IUser>('users');
-      
-               if (managerId) {
-                 const cafIds = users.filter(u=>u.managerId===managerId).map(u=>u.username);
-                 return res.json(rows.filter(r=>cafIds.includes(r.username)));
-               }
-               res.json(rows);
-             });
-      
-             export default router;
+// =============== backend/src/routes/progress.ts ===============
+import { Router } from 'express';
+import { PrismaClient } from '@prisma/client';
+
+const router = Router();
+const prisma = new PrismaClient();
+
+// GET by username
+router.get('/:username', async (req, res, next) => {
+  try {
+    const rows = await prisma.progress.findMany({
+      where: { user: { username: req.params.username } },
+      include: { visitedItems: true }
+    });
+    res.json(rows);
+  } catch (err) { next(err); }
+});
+
+// PATCH update/create progress
+router.patch('/', async (req, res, next) => {
+  const { username, moduleId, visited } = req.body as any;
+  if (!username || !moduleId) return res.status(400).json({ error: 'Données manquantes' });
+  try {
+    const user = await prisma.user.findUnique({ where: { username } });
+    if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
+    let prog = await prisma.progress.findFirst({ where: { userId: user.id, moduleId } });
+    if (!prog) {
+      prog = await prisma.progress.create({ data: { userId: user.id, moduleId } });
+    }
+    await prisma.visitedItem.deleteMany({ where: { progressId: prog.id } });
+    for (const itemId of visited || []) {
+      await prisma.visitedItem.create({ data: { progressId: prog.id, itemId } });
+    }
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+});
+
+// GET all or by managerId
+router.get('/', async (req, res, next) => {
+  const { managerId } = req.query;
+  try {
+    let rows;
+    if (managerId) {
+      const cafs = await prisma.user.findMany({ where: { managerId: String(managerId) } });
+      rows = await prisma.progress.findMany({ where: { userId: { in: cafs.map(u => u.id) } }, include: { visitedItems: true } });
+    } else {
+      rows = await prisma.progress.findMany({ include: { visitedItems: true } });
+    }
+    res.json(rows);
+  } catch (err) { next(err); }
+});
+
+export default router;

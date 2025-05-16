@@ -1,11 +1,11 @@
+// =============== backend/src/index.ts ===============
 import path from 'path';
 import dotenv from 'dotenv';
-
-// Charger **immédiatement** le .env du dossier backend
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
-
 import express from 'express';
 import cors from 'cors';
+
+// Charger .env
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 import authRouter from './routes/auth';
 import usersRouter from './routes/users';
@@ -25,10 +25,6 @@ app.use('/api/modules', modulesRouter);
 app.use('/api/notifications', notifsRouter);
 app.use('/api/progress', progressRouter);
 
-app.get('/', (_req, res) => {
-res.send('🚀 Backend TS démarré !');
-});
+app.get('/', (_req, res) => { res.send('🚀 Backend TS avec Prisma démarré !'); });
 
-app.listen(PORT, () => {
-console.log(`🚀 Backend TS sur http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Backend sur http://localhost:${PORT}`));

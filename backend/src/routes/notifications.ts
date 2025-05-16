@@ -1,30 +1,24 @@
+// =============== backend/src/routes/notifications.ts ===============
 import { Router } from 'express';
-import { read, write } from '../config/dataStore';
-import { INotification } from '../models/INotification';
+import { PrismaClient } from '@prisma/client';
 
 const router = Router();
-const NOTIFS = 'notifications';
+const prisma = new PrismaClient();
 
-/**
-  * GET /api/notifications
-  */
-router.get('/', (req, res) => {
-res.json(read<INotification>(NOTIFS));
+// GET notifications
+router.get('/', async (_req, res, next) => {
+  try {
+    const list = await prisma.notification.findMany();
+    res.json(list);
+  } catch (err) { next(err); }
 });
 
-/**
-* POST /api/notifications
-* Body: { username, date, message? }
-*/
-router.post('/', (req, res) => {
-const notifs = read<INotification>(NOTIFS);
-const entry: INotification = {
-    id: Date.now().toString(),
-    ...req.body as Omit<INotification,'id'>
-};
-notifs.push(entry);
-write(NOTIFS, notifs);
-res.status(201).json(entry);
+// POST notification
+router.post('/', async (req, res, next) => {
+  try {
+    const entry = await prisma.notification.create({ data: req.body });
+    res.status(201).json(entry);
+  } catch (err) { next(err); }
 });
 
 export default router;
