@@ -33,6 +33,7 @@ model Module {
   summary     String?
   enabled     Boolean
   items       Item[]
+  progress    Progress[] 
 }
 
 model Item {
