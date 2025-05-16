@@ -1,0 +1,19 @@
+# backend/docker-compose.yml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: caf_postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: camile
+      POSTGRES_PASSWORD: caftrainer2025
+      POSTGRES_DB: caf_trainer
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
