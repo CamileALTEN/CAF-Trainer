@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  caf
+  manager
+  admin
+}
+
+model User {
+  id            String     @id
+  username      String     @unique
+  password      String
+  role          Role
+  site          String?
+  managerId     String?    
+  manager       User?      @relation("UserManager", fields: [managerId], references: [id])
+  subordinates  User[]     @relation("UserManager")
+  notifications Notification[]
+  progress      Progress[]
+}
+
+model Module {
+  id          String    @id
+  title       String
+  description String?   
+  summary     String?
+  enabled     Boolean
+  items       Item[]
+}
+
+model Item {
+  id             String         @id
+  title          String
+  subtitle       String?
+  content        String?
+  enabled        Boolean
+  module         Module         @relation(fields: [moduleId], references: [id])
+  moduleId       String
+  parentItemId   String?        
+  parentItem     Item?          @relation("ItemChildren", fields: [parentItemId], references: [id])
+  children       Item[]         @relation("ItemChildren")
+  links          ItemLink[]
+  images         ItemImage[]
+  videos         ItemVideo[]
+  profiles       ItemProfile[]
+  visitedItems   VisitedItem[]
+}
+
+model ItemLink {
+  id     Int    @id @default(autoincrement())
+  item   Item   @relation(fields: [itemId], references: [id])
+  itemId String
+  title  String?
+  url    String
+  label  String?
+}
+
+model ItemImage {
+  id      Int    @id @default(autoincrement())
+  item    Item   @relation(fields: [itemId], references: [id])
+  itemId  String
+  src     String
+  width   Int?
+  align   String?
+}
+
+model ItemVideo {
+  id      Int    @id @default(autoincrement())
+  item    Item   @relation(fields: [itemId], references: [id])
+  itemId  String
+  src     String
+  label   String?
+}
+
+model ItemProfile {
+  item     Item   @relation(fields: [itemId], references: [id])
+  itemId   String
+  profile  String
+  @@id([itemId, profile])
+}
+
+model Notification {
+  id      String   @id
+  user    User     @relation(fields: [userId], references: [id])
+  userId  String
+  date    DateTime
+  message String
+}
+
+model Progress {
+  id           Int           @id @default(autoincrement())
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String
+  module       Module        @relation(fields: [moduleId], references: [id])
+  moduleId     String
+  visitedItems VisitedItem[]
+}
+
+model VisitedItem {
+  progress    Progress  @relation(fields: [progressId], references: [id])
+  progressId  Int
+  item        Item      @relation(fields: [itemId], references: [id])
+  itemId      String
+  @@id([progressId, itemId])
+}
