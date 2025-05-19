@@ -55,7 +55,7 @@ router.post('/', authorize('admin'), async (req: AuthRequest, res, next) => {
 
     // Create user with generated id
     const id = Date.now().toString();
-    const hash = bcrypt.hashSync(password, 8);
+    const hash = bcrypt.hashSync(password, 12);
     const user = await prisma.user.create({
       data: { id, username, password: hash, role, site, managerId }
     });
@@ -77,7 +77,7 @@ router.patch('/:id/password', authorize('admin', 'manager', 'caf', 'user'), asyn
     if (req.user?.role !== 'admin' && req.user?.id !== req.params.id) {
       return res.status(403).json({ error: 'Accès refusé' });
     }
-    const hash = bcrypt.hashSync(password, 8);
+    const hash = bcrypt.hashSync(password, 12);
     await prisma.user.update({ where: { id: req.params.id }, data: { password: hash } });
     res.json({ ok: true });
   } catch (err) {

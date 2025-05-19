@@ -33,7 +33,7 @@ router.post('/register', async (req, res) => {
   const exists = await prisma.user.findUnique({ where: { username } });
   if (exists) return res.status(409).json({ error: 'Nom déjà pris' });
   const id = Date.now().toString();
-  const hash = bcrypt.hashSync(password, 8);
+  const hash = bcrypt.hashSync(password, 12);
   const user = await prisma.user.create({ data: { id, username, password: hash, role, site, managerId } });
   const { password: _, ...safe } = user;
   res.status(201).json(safe);
