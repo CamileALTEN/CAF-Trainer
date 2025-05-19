@@ -1,0 +1,19 @@
+FROM node:20-alpine
+WORKDIR /app
+ENV NODE_ENV=development
+
+# 1. Dépendances (cache layer)
+COPY package*.json ./
+RUN npm ci
+
+# 2. Prisma : générer le client
+COPY prisma ./prisma
+RUN npx prisma generate
+
+# 3. Code : sera monté en volume, mais on met une copie initiale
+COPY src ./src
+
+# 4. Hot-reload
+RUN npm i -D ts-node-dev
+CMD ["npm", "run", "dev"]
+EXPOSE 5000

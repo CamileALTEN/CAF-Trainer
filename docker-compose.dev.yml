@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: camile
+      POSTGRES_PASSWORD: caftrainer2025
+      POSTGRES_DB: caf_trainer
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    working_dir: /app
+    env_file: .env
+    depends_on: [postgres]
+    volumes:
+      - ./backend/src:/app/src        # hot-reload du code
+      - /app/node_modules             # garde le node_modules du conteneur
+    command: npm run dev
+    ports:
+      - "5000:5000"
+
+volumes:
+  pgdata: {}

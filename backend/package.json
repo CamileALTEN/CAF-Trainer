@@ -3,9 +3,10 @@
     "version": "1.0.0",
     "main": "dist/index.js",
     "scripts": {
+        "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
         "build": "tsc",
-        "start": "ts-node-dev --respawn --transpile-only src/index.ts"
-    },
+        "start": "node build/index.js"
+      },
     "dependencies": {
         "@prisma/client": "^6.8.1",
         "bcryptjs": "^3.0.2",
