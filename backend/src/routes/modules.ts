@@ -1,6 +1,8 @@
 // =============== backend/src/routes/modules.ts ===============
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
+import type { AuthRequest } from '../middleware/auth';
+import { authorize } from '../middleware/auth';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -23,7 +25,7 @@ router.get('/:id', async (req, res, next) => {
 });
 
 // CREATE
-router.post('/', async (req, res, next) => {
+router.post('/', authorize('admin'), async (req: AuthRequest, res, next) => {
   try {
     const { title, summary } = req.body;
     const id = Date.now().toString();
@@ -33,7 +35,7 @@ router.post('/', async (req, res, next) => {
 });
 
 // REPLACE
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', authorize('admin'), async (req: AuthRequest, res, next) => {
   try {
     const mod = await prisma.module.update({ where: { id: req.params.id }, data: req.body });
     res.json(mod);
@@ -41,7 +43,7 @@ router.put('/:id', async (req, res, next) => {
 });
 
 // PARTIAL UPDATE
-router.patch('/:id', async (req, res, next) => {
+router.patch('/:id', authorize('admin'), async (req: AuthRequest, res, next) => {
   try {
     const mod = await prisma.module.update({ where: { id: req.params.id }, data: req.body });
     res.json(mod);
@@ -49,7 +51,7 @@ router.patch('/:id', async (req, res, next) => {
 });
 
 // DELETE
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', authorize('admin'), async (req: AuthRequest, res, next) => {
   try {
     await prisma.module.delete({ where: { id: req.params.id } });
     res.status(204).end();

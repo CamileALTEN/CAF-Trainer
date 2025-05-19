@@ -1,5 +1,7 @@
 // =============== backend/src/routes/users.ts ===============
 import { Router } from 'express';
+import type { AuthRequest } from '../middleware/auth';
+import { authorize } from '../middleware/auth';
 import bcrypt from 'bcryptjs';
 
 import { PrismaClient } from '@prisma/client';
@@ -9,16 +11,16 @@ const prisma = new PrismaClient();
 const mailRx = /^[a-z0-9]+(\.[a-z0-9]+)?@alten\.com$/i;
 
 // GET users (optional managerId)
-router.get('/', async (req, res, next) => {
-  const { managerId } = req.query;
+router.get('/', authorize('admin', 'manager'), async (req: AuthRequest, res, next) => {
   try {
     let users;
-    if (managerId) {
-      users = await prisma.user.findMany({ where: { managerId: String(managerId) } });
+    if (req.user?.role === 'manager') {
+      users = await prisma.user.findMany({ where: { managerId: req.user.id } });
+    } else if (req.query.managerId) {
+      users = await prisma.user.findMany({ where: { managerId: String(req.query.managerId) } });
     } else {
       users = await prisma.user.findMany();
     }
-    // strip password
     const safe = users.map(({ password, ...u }) => u);
     res.json(safe);
   } catch (err) {
@@ -27,7 +29,7 @@ router.get('/', async (req, res, next) => {
 });
 
 // POST create user
-router.post('/', async (req, res, next) => {
+router.post('/', authorize('admin'), async (req: AuthRequest, res, next) => {
   const { username, password, role, site, managerId } = req.body as any;
 
   // Validations
@@ -67,11 +69,14 @@ router.post('/', async (req, res, next) => {
 });
 
 // PATCH password
-router.patch('/:id/password', async (req, res, next) => {
+router.patch('/:id/password', authorize('admin', 'manager', 'caf', 'user'), async (req: AuthRequest, res, next) => {
   const { password } = req.body;
   if (!password) return res.status(400).json({ error: 'pwd manquant' });
 
   try {
+    if (req.user?.role !== 'admin' && req.user?.id !== req.params.id) {
+      return res.status(403).json({ error: 'Accès refusé' });
+    }
     const hash = bcrypt.hashSync(password, 8);
     await prisma.user.update({ where: { id: req.params.id }, data: { password: hash } });
     res.json({ ok: true });
@@ -81,13 +86,16 @@ router.patch('/:id/password', async (req, res, next) => {
 });
 
 // PATCH general
-router.patch('/:id', async (req, res, next) => {
+router.patch('/:id', authorize('admin', 'manager', 'caf', 'user'), async (req: AuthRequest, res, next) => {
   const data = req.body as any;
   if (data.username && !mailRx.test(data.username)) {
     return res.status(400).json({ error: 'Username invalide' });
   }
 
   try {
+    if (req.user?.role !== 'admin' && req.user?.id !== req.params.id) {
+      return res.status(403).json({ error: 'Accès refusé' });
+    }
     const updated = await prisma.user.update({ where: { id: req.params.id }, data });
     const { password, ...safe } = updated;
     res.json(safe);
@@ -97,7 +105,7 @@ router.patch('/:id', async (req, res, next) => {
 });
 
 // DELETE user
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', authorize('admin'), async (req: AuthRequest, res, next) => {
   try {
     await prisma.user.delete({ where: { id: req.params.id } });
     res.status(204).end();
