@@ -2,6 +2,7 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
 import { sendMail } from '../utils/mailer';
 
 const router = Router();
@@ -16,7 +17,10 @@ router.post('/login', async (req, res) => {
   if (!bcrypt.compareSync(password, user.password))
     return res.status(401).json({ error: 'Identifiants invalides' });
   const { id, role, site } = user;
-  res.json({ id, username, role, site });
+  const token = jwt.sign({ id, role }, process.env.JWT_SECRET || 'changeme', {
+    expiresIn: '1h'
+  });
+  res.json({ token, user: { id, username, role, site } });
 });
 
 // REGISTER
