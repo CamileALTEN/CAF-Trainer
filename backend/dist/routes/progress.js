@@ -1,37 +1,62 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// =============== backend/src/routes/progress.ts ===============
 const express_1 = require("express");
-const dataStore_1 = require("../config/dataStore");
+const client_1 = require("@prisma/client");
 const router = (0, express_1.Router)();
-const TABLE = 'progress';
-/* GET /api/progress/:username   – lecture complète d’un CAF */
-router.get('/:username', (req, res) => {
-    const rows = (0, dataStore_1.read)(TABLE).filter(p => p.username === req.params.username);
-    res.json(rows);
+const prisma = new client_1.PrismaClient();
+// GET by username
+router.get('/:username', async (req, res, next) => {
+    try {
+        const rows = await prisma.progress.findMany({
+            where: { user: { username: req.params.username } },
+            include: { visitedItems: true }
+        });
+        res.json(rows);
+    }
+    catch (err) {
+        next(err);
+    }
 });
-/* PATCH /api/progress   body:{ username,moduleId,visited } – MAJ 1 module */
-router.patch('/', (req, res) => {
+// PATCH update/create progress
+router.patch('/', async (req, res, next) => {
     const { username, moduleId, visited } = req.body;
     if (!username || !moduleId)
         return res.status(400).json({ error: 'Données manquantes' });
-    const list = (0, dataStore_1.read)(TABLE);
-    const idx = list.findIndex(p => p.username === username && p.moduleId === moduleId);
-    if (idx === -1)
-        list.push({ username, moduleId, visited });
-    else
-        list[idx].visited = visited;
-    (0, dataStore_1.write)(TABLE, list);
-    res.json({ ok: true });
-});
-/* GET /api/progress?managerId=… – progression de tous les CAF d’un manager */
-router.get('/', (req, res) => {
-    const { managerId } = req.query;
-    const rows = (0, dataStore_1.read)(TABLE);
-    const users = (0, dataStore_1.read)('users');
-    if (managerId) {
-        const cafIds = users.filter(u => u.managerId === managerId).map(u => u.username);
-        return res.json(rows.filter(r => cafIds.includes(r.username)));
+    try {
+        const user = await prisma.user.findUnique({ where: { username } });
+        if (!user)
+            return res.status(404).json({ error: 'Utilisateur introuvable' });
+        let prog = await prisma.progress.findFirst({ where: { userId: user.id, moduleId } });
+        if (!prog) {
+            prog = await prisma.progress.create({ data: { userId: user.id, moduleId } });
+        }
+        await prisma.visitedItem.deleteMany({ where: { progressId: prog.id } });
+        for (const itemId of visited || []) {
+            await prisma.visitedItem.create({ data: { progressId: prog.id, itemId } });
+        }
+        res.json({ ok: true });
     }
-    res.json(rows);
+    catch (err) {
+        next(err);
+    }
+});
+// GET all or by managerId
+router.get('/', async (req, res, next) => {
+    const { managerId } = req.query;
+    try {
+        let rows;
+        if (managerId) {
+            const cafs = await prisma.user.findMany({ where: { managerId: String(managerId) } });
+            rows = await prisma.progress.findMany({ where: { userId: { in: cafs.map(u => u.id) } }, include: { visitedItems: true } });
+        }
+        else {
+            rows = await prisma.progress.findMany({ include: { visitedItems: true } });
+        }
+        res.json(rows);
+    }
+    catch (err) {
+        next(err);
+    }
 });
 exports.default = router;

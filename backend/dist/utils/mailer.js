@@ -7,10 +7,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendMail = void 0;
+exports.sendMail = sendMail;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 /* ---------- variables d’env. ---------- */
-const { MAIL_USER = '', // ex. [services@conforea.fr](mailto:services@conforea.fr)
+const { MAIL_USER = '', // ex. services@conforea.fr
 MAIL_PASS = '', // ex. Test2025!
 MAIL_HOST = 'ns0.ovh.net', // hôte SMTP OVH
  } = process.env;
@@ -29,7 +29,7 @@ subject, html) {
             const opts = {
                 host: MAIL_HOST,
                 port,
-                secure: port === 465,
+                secure: port === 465, // secure seulement sur 465
                 auth: { user: MAIL_USER, pass: MAIL_PASS },
                 connectionTimeout: 15000,
             };
@@ -52,4 +52,3 @@ subject, html) {
     /* si aucune tentative n’a réussi */
     throw lastErr ?? new Error('Envoi courriel impossible');
 }
-exports.sendMail = sendMail;

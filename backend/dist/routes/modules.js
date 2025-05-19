@@ -1,64 +1,72 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// =============== backend/src/routes/modules.ts ===============
 const express_1 = require("express");
-const dataStore_1 = require("../config/dataStore");
+const client_1 = require("@prisma/client");
 const router = (0, express_1.Router)();
-const TABLE = 'modules';
-/* util ------------------------------------------------------------------ */
-function load() { return (0, dataStore_1.read)(TABLE); }
-function save(list) { (0, dataStore_1.write)(TABLE, list); }
-function byId(id, list = load()) { return list.find(m => m.id === id); }
-function idx(id, list = load()) { return list.findIndex(m => m.id === id); }
-/* GET /api/modules ------------------------------------------------------- */
-router.get('/', (_req, res) => res.json(load()));
-/* GET /api/modules/:id --------------------------------------------------- */
-router.get('/:id', (req, res) => {
-    const mod = byId(req.params.id);
-    mod ? res.json(mod) : res.status(404).json({ error: 'Module non trouvé' });
+const prisma = new client_1.PrismaClient();
+// GET all modules
+router.get('/', async (_req, res, next) => {
+    try {
+        const modules = await prisma.module.findMany({ include: { items: true } });
+        res.json(modules);
+    }
+    catch (err) {
+        next(err);
+    }
 });
-/* POST /api/modules  (création) ----------------------------------------- */
-router.post('/', (req, res) => {
-    const list = load();
-    const id = Date.now().toString();
-    const mod = {
-        id,
-        title: req.body.title ?? 'Nouveau module',
-        summary: req.body.summary ?? '',
-        enabled: true,
-        items: [],
-    };
-    list.push(mod);
-    save(list);
-    res.status(201).json(mod);
+// GET by ID
+router.get('/:id', async (req, res, next) => {
+    try {
+        const mod = await prisma.module.findUnique({ where: { id: req.params.id }, include: { items: true } });
+        if (!mod)
+            return res.status(404).json({ error: 'Module non trouvé' });
+        res.json(mod);
+    }
+    catch (err) {
+        next(err);
+    }
 });
-/* PUT /api/modules/:id  (remplacement intégral) ------------------------- */
-router.put('/:id', (req, res) => {
-    const list = load();
-    const index = idx(req.params.id, list);
-    if (index === -1)
-        return res.status(404).json({ error: 'Module non trouvé' });
-    list[index] = req.body;
-    save(list);
-    res.json(list[index]);
+// CREATE
+router.post('/', async (req, res, next) => {
+    try {
+        const { title, summary } = req.body;
+        const id = Date.now().toString();
+        const mod = await prisma.module.create({ data: { id, title: title ?? 'Nouveau module', summary: summary ?? '', enabled: true } });
+        res.status(201).json(mod);
+    }
+    catch (err) {
+        next(err);
+    }
 });
-/* PATCH /api/modules/:id  (MAJ partielle) ------------------------------- */
-router.patch('/:id', (req, res) => {
-    const list = load();
-    const mod = byId(req.params.id, list);
-    if (!mod)
-        return res.status(404).json({ error: 'Module non trouvé' });
-    Object.assign(mod, req.body);
-    save(list);
-    res.json(mod);
+// REPLACE
+router.put('/:id', async (req, res, next) => {
+    try {
+        const mod = await prisma.module.update({ where: { id: req.params.id }, data: req.body });
+        res.json(mod);
+    }
+    catch (err) {
+        next(err);
+    }
 });
-/* DELETE /api/modules/:id ----------------------------------------------- */
-router.delete('/:id', (req, res) => {
-    const list = load();
-    const index = idx(req.params.id, list);
-    if (index === -1)
-        return res.status(404).json({ error: 'Module non trouvé' });
-    list.splice(index, 1);
-    save(list);
-    res.status(204).end();
+// PARTIAL UPDATE
+router.patch('/:id', async (req, res, next) => {
+    try {
+        const mod = await prisma.module.update({ where: { id: req.params.id }, data: req.body });
+        res.json(mod);
+    }
+    catch (err) {
+        next(err);
+    }
+});
+// DELETE
+router.delete('/:id', async (req, res, next) => {
+    try {
+        await prisma.module.delete({ where: { id: req.params.id } });
+        res.status(204).end();
+    }
+    catch (err) {
+        next(err);
+    }
 });
 exports.default = router;

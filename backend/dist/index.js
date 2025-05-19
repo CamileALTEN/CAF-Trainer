@@ -3,12 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// =============== backend/src/index.ts ===============
 const path_1 = __importDefault(require("path"));
 const dotenv_1 = __importDefault(require("dotenv"));
-// Charger **immédiatement** le .env du dossier backend
-dotenv_1.default.config({ path: path_1.default.resolve(__dirname, '../.env') });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
+// Charger .env
+dotenv_1.default.config({ path: path_1.default.resolve(__dirname, '../.env') });
 const auth_1 = __importDefault(require("./routes/auth"));
 const users_1 = __importDefault(require("./routes/users"));
 const modules_1 = __importDefault(require("./routes/modules"));
@@ -23,9 +24,5 @@ app.use('/api/users', users_1.default);
 app.use('/api/modules', modules_1.default);
 app.use('/api/notifications', notifications_1.default);
 app.use('/api/progress', progress_1.default);
-app.get('/', (_req, res) => {
-    res.send('🚀 Backend TS démarré !');
-});
-app.listen(PORT, () => {
-    console.log(`🚀 Backend TS sur http://localhost:${PORT}`);
-});
+app.get('/', (_req, res) => { res.send('🚀 Backend TS avec Prisma démarré !'); });
+app.listen(PORT, () => console.log(`🚀 Backend sur http://localhost:${PORT}`));

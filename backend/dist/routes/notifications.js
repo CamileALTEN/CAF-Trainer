@@ -1,27 +1,28 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// =============== backend/src/routes/notifications.ts ===============
 const express_1 = require("express");
-const dataStore_1 = require("../config/dataStore");
+const client_1 = require("@prisma/client");
 const router = (0, express_1.Router)();
-const NOTIFS = 'notifications';
-/**
-  * GET /api/notifications
-  */
-router.get('/', (req, res) => {
-    res.json((0, dataStore_1.read)(NOTIFS));
+const prisma = new client_1.PrismaClient();
+// GET notifications
+router.get('/', async (_req, res, next) => {
+    try {
+        const list = await prisma.notification.findMany();
+        res.json(list);
+    }
+    catch (err) {
+        next(err);
+    }
 });
-/**
-* POST /api/notifications
-* Body: { username, date, message? }
-*/
-router.post('/', (req, res) => {
-    const notifs = (0, dataStore_1.read)(NOTIFS);
-    const entry = {
-        id: Date.now().toString(),
-        ...req.body
-    };
-    notifs.push(entry);
-    (0, dataStore_1.write)(NOTIFS, notifs);
-    res.status(201).json(entry);
+// POST notification
+router.post('/', async (req, res, next) => {
+    try {
+        const entry = await prisma.notification.create({ data: req.body });
+        res.status(201).json(entry);
+    }
+    catch (err) {
+        next(err);
+    }
 });
 exports.default = router;
