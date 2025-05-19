@@ -1,22 +1,30 @@
+############################################################
+# CAF-Trainer • backend • Dockerfile.dev (hot-reload)
+############################################################
 FROM node:20-alpine
 WORKDIR /app
-ENV NODE_ENV=development
+ENV NODE_ENV=development \
+    NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/corp-root-ca.crt
 
-COPY certs/proxy-root.crt /usr/local/share/ca-certificates/
-RUN update-ca-certificates
+# 1) Certificat interne
+COPY backend/corp-root-ca.cer /usr/local/share/ca-certificates/corp-root-ca.crt
+RUN cat /usr/local/share/ca-certificates/corp-root-ca.crt >> /etc/ssl/certs/ca-certificates.crt
 
-# 1. Dépendances (cache layer)
+# 2) Dépendances mono-repo
 COPY package*.json ./
-RUN npm ci
+COPY backend/package*.json backend/
+COPY tsconfig*.json ./
+RUN npm ci --workspaces --include-workspace-root=false --workspace backend
 
-# 2. Prisma : générer le client
-COPY prisma ./prisma
-RUN npx prisma generate
+# 3) Code complet + génération Prisma
+COPY backend ./backend
 
-# 3. Code : sera monté en volume, mais on met une copie initiale
-COPY src ./src
+WORKDIR /app/backend
+RUN npx prisma generate                     
 
-# 4. Hot-reload
+# 4) Hot-reload
+WORKDIR /app/backend
 RUN npm i -D ts-node-dev
 CMD ["npm", "run", "dev"]
+
 EXPOSE 5000

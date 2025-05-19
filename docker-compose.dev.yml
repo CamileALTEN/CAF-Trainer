@@ -15,14 +15,15 @@ services:
 
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile.dev
-    working_dir: /app
+      context: .                 # racine du repo
+      dockerfile: backend/Dockerfile.dev
+    working_dir: /app/backend
     env_file: .env
     depends_on: [postgres]
     volumes:
-      - ./backend/src:/app/src        # hot-reload du code
-      - /app/node_modules             # garde le node_modules du conteneur
+      - ./backend:/app/backend           # code + prisma en live
+      - ./tsconfig.json:/app/tsconfig.json:ro
+      - /app/backend/node_modules        # conserve node_modules du conteneur
     command: npm run dev
     ports:
       - "5000:5000"
