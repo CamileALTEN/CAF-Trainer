@@ -1,9 +1,11 @@
 version: "3.9"
 
 services:
+  # ────────────────────── PostgreSQL ──────────────────────
   postgres:
     image: postgres:15
-    restart: always
+    container_name: caftrainer_postgres
+    restart: unless-stopped
     environment:
       POSTGRES_USER: camile
       POSTGRES_PASSWORD: caftrainer2025
@@ -13,20 +15,39 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  # ──────────────────────── Backend ───────────────────────
   backend:
+    container_name: caftrainer_backend
     build:
-      context: .                 # racine du repo
+      context: .
       dockerfile: backend/Dockerfile.dev
-    working_dir: /app/backend
-    env_file: .env
+    working_dir: /app/backend                # même que WORKDIR Dockerfile
+    env_file: .env                           # contient PORT=5000, DATABASE_URL…
     depends_on: [postgres]
     volumes:
-      - ./backend:/app/backend           # code + prisma en live
+      - ./backend:/app/backend               # code + prisma montés en live
       - ./tsconfig.json:/app/tsconfig.json:ro
-      - /app/backend/node_modules        # conserve node_modules du conteneur
-    command: npm run dev
+      - /app/backend/node_modules            # garde node_modules dans le conteneur
+    command: sh -c "npx prisma migrate deploy && npm run dev"
     ports:
       - "5000:5000"
+
+  # ─────────────────────── Frontend ───────────────────────
+  frontend:
+    container_name: caftrainer_frontend
+    build:
+      context: .
+      dockerfile: client/Dockerfile.dev
+    working_dir: /app/client
+    depends_on: [backend]
+    environment:                              # force CRA à écouter partout sur 3000
+      - HOST=0.0.0.0
+      - PORT=3000
+    volumes:
+      - ./client:/app/client                 # hot-reload CRA
+      - /app/client/node_modules
+    ports:
+      - "3000:3000"
 
 volumes:
   pgdata: {}

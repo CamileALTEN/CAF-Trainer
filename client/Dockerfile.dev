@@ -1,0 +1,26 @@
+############################################################
+# CAF-Trainer • client • Dockerfile.dev (CRA + hot-reload)
+############################################################
+FROM node:20-alpine
+WORKDIR /app
+ENV NODE_ENV=development \
+    CHOKIDAR_USEPOLLING=true \
+    NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/corp-root-ca.crt
+
+# ── Certificat proxy entreprise ───────────────────────────
+COPY client/corp-root-ca.cer /usr/local/share/ca-certificates/corp-root-ca.crt
+RUN cat /usr/local/share/ca-certificates/corp-root-ca.crt >> /etc/ssl/certs/ca-certificates.crt
+
+# ── Dépendances du workspace « client » ───────────────────
+COPY package*.json ./
+COPY client/package*.json client/
+RUN npm ci --workspaces --include-workspace-root=false --workspace client
+
+# ── Code complet du front ─────────────────────────────────
+COPY client ./client
+WORKDIR /app/client
+
+# CRA lance automatiquement le serveur dev sur 3000
+CMD ["npm", "start"]
+
+EXPOSE 3000
