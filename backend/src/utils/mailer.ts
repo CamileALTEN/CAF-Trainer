@@ -13,7 +13,7 @@ MAIL_PASS = '',                 // ex. Test2025!
 MAIL_HOST = 'ns0.ovh.net',      // hôte SMTP OVH
 } = process.env;
 
-const PORTS = [ 587];     // ordre de tentative
+const PORTS = [587, 465];            // ordre de tentative : STARTTLS puis TLS
 
 /* ---------- helper exporté ---------- */
 export async function sendMail(
@@ -39,6 +39,7 @@ for (const port of PORTS) {
         secure: port === 465,                // secure seulement sur 465
         auth:   { user: MAIL_USER, pass: MAIL_PASS },
         connectionTimeout: 15_000,
+        tls: { rejectUnauthorized: true },
     };
 
     const transporter: Transporter = nodemailer.createTransport(opts);

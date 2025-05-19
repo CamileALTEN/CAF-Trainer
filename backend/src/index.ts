@@ -3,6 +3,9 @@ import path from 'path';
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import https from 'https';
+import fs from 'fs';
 
 // Charger .env
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -15,7 +18,7 @@ import progressRouter from './routes/progress';
 import { authenticate } from './middleware/auth';
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const { PORT = 5000, TLS_KEY_PATH, TLS_CERT_PATH } = process.env as Record<string, string>;
 
 
 app.use(
@@ -24,6 +27,7 @@ app.use(
       credentials: true,
     })
   );
+app.use(helmet());
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
@@ -34,4 +38,13 @@ app.use('/api/progress', authenticate, progressRouter);
 
 app.get('/', (_req, res) => { res.send('🚀 Backend TS avec Prisma démarré !'); });
 
-app.listen(PORT, () => console.log(`🚀 Backend sur http://localhost:${PORT}`));
+let server;
+if (TLS_KEY_PATH && TLS_CERT_PATH) {
+  const key = fs.readFileSync(path.resolve(__dirname, '..', TLS_KEY_PATH));
+  const cert = fs.readFileSync(path.resolve(__dirname, '..', TLS_CERT_PATH));
+  server = https.createServer({ key, cert }, app);
+  app.use(helmet.hsts({ maxAge: 63072000, includeSubDomains: true }));
+  server.listen(PORT, () => console.log(`🚀 Backend en HTTPS sur port ${PORT}`));
+} else {
+  server = app.listen(PORT, () => console.log(`🚀 Backend sur http://localhost:${PORT}`));
+}
