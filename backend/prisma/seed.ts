@@ -31,6 +31,7 @@ async function main() {
         username: u.username,
         password: u.password,
         role: u.role,
+        tokenVersion: 0,
         site: u.site || null
       },
       create: {
@@ -38,6 +39,7 @@ async function main() {
         username: u.username,
         password: u.password,
         role: u.role,
+        tokenVersion: 0,
         site: u.site || null,
         managerId: null
       }

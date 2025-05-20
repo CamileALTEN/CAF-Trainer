@@ -16,21 +16,29 @@ import modulesRouter from './routes/modules';
 import notifsRouter from './routes/notifications';
 import progressRouter from './routes/progress';
 import { authenticate } from './middleware/auth';
+import { requestLogger } from './middleware/logger';
+import { errorHandler } from './middleware/errorHandler';
 import '../config/secrets';
 
 const app = express();
-const { NODE_ENV = 'development', PORT = 5000, TLS_KEY_PATH, TLS_CERT_PATH } =
-  process.env as Record<string, string>;
+const {
+  NODE_ENV = 'development',
+  PORT = 5000,
+  TLS_KEY_PATH,
+  TLS_CERT_PATH,
+  ALLOWED_ORIGIN = 'http://localhost:3000',
+} = process.env as Record<string, string>;
 
 
 app.use(
-    cors({
-      origin: "http://localhost:3000",
-      credentials: true,
-    })
-  );
+  cors({
+    origin: ALLOWED_ORIGIN,
+    credentials: true,
+  })
+);
 app.use(helmet());
 app.use(express.json());
+app.use(requestLogger);
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', authenticate, usersRouter);
@@ -39,6 +47,8 @@ app.use('/api/notifications', authenticate, notifsRouter);
 app.use('/api/progress', authenticate, progressRouter);
 
 app.get('/', (_req, res) => { res.send('🚀 Backend TS avec Prisma démarré !'); });
+
+app.use(errorHandler);
 
 let server;
 if (NODE_ENV === 'production' && (!TLS_KEY_PATH || !TLS_CERT_PATH)) {

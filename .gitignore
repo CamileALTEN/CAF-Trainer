@@ -4,3 +4,4 @@ node_modules
 backend/.env
 backup.sql
 nom-de-domaine.txt
+backend/logs/

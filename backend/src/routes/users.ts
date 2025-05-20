@@ -91,6 +91,16 @@ router.patch('/:id/password', authorize('admin', 'manager', 'caf', 'user'), asyn
   }
 });
 
+// POST revoke tokens by incrementing tokenVersion
+router.post('/:id/revoke', authorize('admin'), async (req: AuthRequest, res, next) => {
+  try {
+    await prisma.user.update({ where: { id: req.params.id }, data: { tokenVersion: { increment: 1 } } });
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // PATCH general
 router.patch('/:id', authorize('admin', 'manager', 'caf', 'user'), async (req: AuthRequest, res, next) => {
   const data = { ...req.body } as any;

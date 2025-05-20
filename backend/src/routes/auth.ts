@@ -17,8 +17,8 @@ router.post('/login', async (req, res) => {
   if (!user) return res.status(401).json({ error: 'Identifiants invalides' });
   if (!bcrypt.compareSync(password, user.password))
     return res.status(401).json({ error: 'Identifiants invalides' });
-  const { id, role, site } = user;
-  const token = jwt.sign({ id, role }, JWT_SECRET, { expiresIn: '1h' });
+  const { id, role, site, tokenVersion } = user;
+  const token = jwt.sign({ id, role, tokenVersion }, JWT_SECRET, { expiresIn: '1h' });
   res.json({ token, user: { id, username, role, site } });
 });
 
