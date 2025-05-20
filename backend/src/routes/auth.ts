@@ -8,18 +8,46 @@ import { sendMail } from '../utils/mailer';
 import { JWT_SECRET } from '../config/secrets';
 import { verifyTOTP, generateSecret } from '../utils/totp';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { logger } from '../middleware/logger';
 
 const router = Router();
 const prisma = new PrismaClient();
 const mailRx = /^[a-z0-9]+(\.[a-z0-9]+)?@alten\.com$/i;
 
+const failures = new Map<string, { count: number; timer: NodeJS.Timeout }>();
+
+function recordFailure(username: string, ip: string) {
+  const key = `${username}:${ip}`;
+  let entry = failures.get(key);
+  if (!entry) {
+    entry = { count: 0, timer: setTimeout(() => failures.delete(key), 60_000) };
+    failures.set(key, entry);
+  }
+  entry.count++;
+  if (entry.count >= 10) {
+    logger.warn('Tentatives de connexion échouées', { username, ip });
+    if (process.env.ALERT_EMAIL) {
+      sendMail(
+        process.env.ALERT_EMAIL,
+        'Alerte tentatives de connexion',
+        `<p>Trop de tentatives pour ${username} depuis ${ip}</p>`
+      ).catch(err => logger.error({ message: 'alert mail failed', error: err.message }));
+    }
+  }
+}
+
 // LOGIN
 router.post('/login', async (req, res) => {
   const { username, password, code } = req.body as { username: string; password: string; code?: string };
   const user = await prisma.user.findUnique({ where: { username } });
-  if (!user) return res.status(401).json({ error: 'Identifiants invalides' });
+  if (!user) {
+    recordFailure(username, req.ip);
+    logger.warn('Echec login utilisateur inconnu', { username, ip: req.ip });
+    return res.status(401).json({ error: 'Identifiants invalides' });
+  }
 
   if (user.lockUntil && user.lockUntil > new Date()) {
+    logger.warn('Tentative sur compte verrouillé', { username, ip: req.ip });
     return res.status(403).json({ error: 'Compte verrouillé. Réessayez plus tard' });
   }
 
@@ -29,8 +57,11 @@ router.post('/login', async (req, res) => {
     if (attempts >= 5) {
       data.lockUntil = new Date(Date.now() + 5 * 60 * 1000);
       data.failedAttempts = 0;
+      logger.warn('Compte verrouillé après échecs', { username, ip: req.ip });
     }
     await prisma.user.update({ where: { id: user.id }, data });
+    recordFailure(username, req.ip);
+    logger.warn('Echec login mauvais mot de passe', { username, ip: req.ip });
     return res.status(401).json({ error: 'Identifiants invalides' });
   }
 
@@ -38,6 +69,8 @@ router.post('/login', async (req, res) => {
     if (!code) return res.status(400).json({ error: 'Code 2FA requis' });
     if (!verifyTOTP(code, user.twoFactorSecret)) {
       await prisma.user.update({ where: { id: user.id }, data: { failedAttempts: { increment: 1 } } });
+      recordFailure(username, req.ip);
+      logger.warn('Echec login 2FA', { username, ip: req.ip });
       return res.status(401).json({ error: 'Identifiants invalides' });
     }
   }
@@ -46,6 +79,7 @@ router.post('/login', async (req, res) => {
 
   const { id, role, site, tokenVersion } = user;
   const token = jwt.sign({ id, role, tokenVersion }, JWT_SECRET, { expiresIn: '1h', algorithm: 'HS256' });
+  logger.info('Connexion reussie', { userId: id, ip: req.ip });
   res.json({ token, user: { id, username, role, site } });
 });
 
@@ -64,6 +98,7 @@ router.post('/register', async (req, res) => {
   const hash = bcrypt.hashSync(password, 12);
   const user = await prisma.user.create({ data: { id, username, password: hash, role, site, managerId } });
   const { password: _, ...safe } = user;
+  logger.info('Utilisateur créé', { createdId: id, ip: req.ip });
   res.status(201).json(safe);
 });
 

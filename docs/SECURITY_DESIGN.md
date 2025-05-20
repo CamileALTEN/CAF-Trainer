@@ -13,8 +13,12 @@ Secrets are loaded from environment variables using `dotenv` and validated on st
 - **Security by Design**: the code applies `helmet` for secure HTTP headers and enforces HTTPS when certificates are provided.
 - **Least Privilege**: API routes use an authentication middleware that verifies the user role before granting access.
 - **Secret Management**: critical secrets (`JWT_SECRET`, `DATA_KEY`, SMTP credentials) are not stored in the repository and must be provided via environment variables.
-- **Logging and Audit**: a winston based logger records HTTP requests and errors to a log file.
+- **Logging and Audit**: a winston based logger records HTTP requests and errors. Critical actions (authentification, modifications d'utilisateurs) sont journalisées. Les fichiers sont rotatifs quotidiennement et peuvent être envoyés vers un serveur syslog via des variables d'environnement. Des alertes sont envoyées après 10 échecs de connexion en une minute.
 - **Revocation**: JWT tokens include a `tokenVersion` checked against the database to allow revocation.
+
+### Conservation des journaux
+
+Les journaux applicatifs sont stockés dans le dossier `logs/` avec rotation quotidienne et conservation pendant 14 jours. En production, un transport Syslog peut les envoyer vers un stockage centralisé immuable. Les messages sensibles (tokens, mots de passe) sont masqués par le middleware d'erreurs.
 
 ## Dependency Management
 

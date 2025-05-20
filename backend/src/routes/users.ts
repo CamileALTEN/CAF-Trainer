@@ -3,6 +3,7 @@ import { Router } from 'express';
 import type { AuthRequest } from '../middleware/auth';
 import { authorize } from '../middleware/auth';
 import bcrypt from 'bcryptjs';
+import { logger } from '../middleware/logger';
 
 import { PrismaClient } from '@prisma/client';
 
@@ -68,6 +69,7 @@ router.post('/', authorize('admin', 'manager'), async (req: AuthRequest, res, ne
 
     // Return user without password
     const { password: _p, ...safe } = user;
+    logger.info('Utilisateur cree', { userId: id, by: req.user?.id, ip: req.ip });
     res.status(201).json(safe);
   } catch (err) {
     next(err);
@@ -85,6 +87,7 @@ router.patch('/:id/password', authorize('admin', 'manager', 'caf', 'user'), asyn
     }
     const hash = bcrypt.hashSync(password, 12);
     await prisma.user.update({ where: { id: req.params.id }, data: { password: hash } });
+    logger.info('Changement mot de passe', { userId: req.params.id, by: req.user?.id, ip: req.ip });
     res.json({ ok: true });
   } catch (err) {
     next(err);
@@ -95,6 +98,7 @@ router.patch('/:id/password', authorize('admin', 'manager', 'caf', 'user'), asyn
 router.post('/:id/revoke', authorize('admin'), async (req: AuthRequest, res, next) => {
   try {
     await prisma.user.update({ where: { id: req.params.id }, data: { tokenVersion: { increment: 1 } } });
+    logger.info('Revocation tokens', { userId: req.params.id, by: req.user?.id, ip: req.ip });
     res.json({ ok: true });
   } catch (err) {
     next(err);
@@ -121,6 +125,7 @@ router.patch('/:id', authorize('admin', 'manager', 'caf', 'user'), async (req: A
     }
     const updated = await prisma.user.update({ where: { id: req.params.id }, data });
     const { password, ...safe } = updated;
+    logger.info('Utilisateur modifie', { userId: req.params.id, by: req.user?.id, ip: req.ip });
     res.json(safe);
   } catch (err) {
     next(err);
@@ -131,6 +136,7 @@ router.patch('/:id', authorize('admin', 'manager', 'caf', 'user'), async (req: A
 router.delete('/:id', authorize('admin'), async (req: AuthRequest, res, next) => {
   try {
     await prisma.user.delete({ where: { id: req.params.id } });
+    logger.warn('Utilisateur supprime', { userId: req.params.id, by: req.user?.id, ip: req.ip });
     res.status(204).end();
   } catch (err) {
     next(err);
