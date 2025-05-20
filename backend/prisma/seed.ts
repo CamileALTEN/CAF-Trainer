@@ -4,6 +4,7 @@
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
+import { encrypt } from '../src/utils/encryption';
 
 const prisma = new PrismaClient();
 
@@ -152,7 +153,7 @@ async function main() {
         id: n.id,
         userId: user.id,
         date: new Date(n.date),
-        message: n.message
+        message: encrypt(n.message)
       }
     });
   }

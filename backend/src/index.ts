@@ -19,7 +19,8 @@ import { authenticate } from './middleware/auth';
 import '../config/secrets';
 
 const app = express();
-const { PORT = 5000, TLS_KEY_PATH, TLS_CERT_PATH } = process.env as Record<string, string>;
+const { NODE_ENV = 'development', PORT = 5000, TLS_KEY_PATH, TLS_CERT_PATH } =
+  process.env as Record<string, string>;
 
 
 app.use(
@@ -40,6 +41,9 @@ app.use('/api/progress', authenticate, progressRouter);
 app.get('/', (_req, res) => { res.send('🚀 Backend TS avec Prisma démarré !'); });
 
 let server;
+if (NODE_ENV === 'production' && (!TLS_KEY_PATH || !TLS_CERT_PATH)) {
+  throw new Error('TLS_KEY_PATH and TLS_CERT_PATH must be set in production');
+}
 if (TLS_KEY_PATH && TLS_CERT_PATH) {
   const key = fs.readFileSync(path.resolve(__dirname, '..', TLS_KEY_PATH));
   const cert = fs.readFileSync(path.resolve(__dirname, '..', TLS_CERT_PATH));
