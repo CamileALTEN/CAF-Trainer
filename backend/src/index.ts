@@ -16,7 +16,6 @@ import modulesRouter from './routes/modules';
 import notifsRouter from './routes/notifications';
 import progressRouter from './routes/progress';
 import { authenticate } from './middleware/auth';
-import '../config/secrets';
 
 const app = express();
 const { PORT = 5000, TLS_KEY_PATH, TLS_CERT_PATH } = process.env as Record<string, string>;
