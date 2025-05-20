@@ -3,4 +3,4 @@ node_modules
 .env
 backend/.env
 backup.sql
-nom de domaine.txt
+nom-de-domaine.txt
