@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { sendMail } from '../utils/mailer';
+import { JWT_SECRET } from '../config/secrets';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -17,9 +18,7 @@ router.post('/login', async (req, res) => {
   if (!bcrypt.compareSync(password, user.password))
     return res.status(401).json({ error: 'Identifiants invalides' });
   const { id, role, site } = user;
-  const token = jwt.sign({ id, role }, process.env.JWT_SECRET || 'changeme', {
-    expiresIn: '1h'
-  });
+  const token = jwt.sign({ id, role }, JWT_SECRET, { expiresIn: '1h' });
   res.json({ token, user: { id, username, role, site } });
 });
 

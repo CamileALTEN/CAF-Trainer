@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import type { AuthRequest } from '../middleware/auth';
 import { authorize } from '../middleware/auth';
+import { encrypt, decryptSafe } from '../utils/encryption';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -11,15 +12,17 @@ const prisma = new PrismaClient();
 router.get('/', authorize('admin'), async (_req: AuthRequest, res, next) => {
   try {
     const list = await prisma.notification.findMany();
-    res.json(list);
+    const out = list.map(n => ({ ...n, message: decryptSafe(n.message) }));
+    res.json(out);
   } catch (err) { next(err); }
 });
 
 // POST notification
 router.post('/', authorize('admin'), async (req: AuthRequest, res, next) => {
   try {
-    const entry = await prisma.notification.create({ data: req.body });
-    res.status(201).json(entry);
+    const data = { ...req.body, message: encrypt(req.body.message) };
+    const entry = await prisma.notification.create({ data });
+    res.status(201).json({ ...entry, message: decryptSafe(entry.message) });
   } catch (err) { next(err); }
 });
 
