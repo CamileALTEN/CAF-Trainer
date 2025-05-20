@@ -29,8 +29,14 @@ router.get('/', authorize('admin', 'manager'), async (req: AuthRequest, res, nex
 });
 
 // POST create user
-router.post('/', authorize('admin'), async (req: AuthRequest, res, next) => {
-  const { username, password, role, site, managerId } = req.body as any;
+router.post('/', authorize('admin', 'manager'), async (req: AuthRequest, res, next) => {
+  let { username, password, role, site, managerId } = req.body as any;
+
+  // Managers can only create CAF accounts for themselves
+  if (req.user?.role === 'manager') {
+    role = 'caf';
+    managerId = req.user.id;
+  }
 
   // Validations
   if (!username || !password || !role) {
@@ -87,10 +93,17 @@ router.patch('/:id/password', authorize('admin', 'manager', 'caf', 'user'), asyn
 
 // PATCH general
 router.patch('/:id', authorize('admin', 'manager', 'caf', 'user'), async (req: AuthRequest, res, next) => {
-  const data = req.body as any;
+  const data = { ...req.body } as any;
   if (data.username && !mailRx.test(data.username)) {
     return res.status(400).json({ error: 'Username invalide' });
   }
+
+  // Non-admin users cannot escalate privileges
+  if (req.user?.role !== 'admin') {
+    delete data.role;
+    delete data.managerId;
+  }
+  delete data.password; // mot de passe via route dédiée
 
   try {
     if (req.user?.role !== 'admin' && req.user?.id !== req.params.id) {
