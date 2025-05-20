@@ -8,6 +8,7 @@ ENV NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/corp-root-ca.crt
 
 # 1) Certificat interne
 COPY backend/corp-root-ca.cer /usr/local/share/ca-certificates/corp-root-ca.crt
+RUN echo "c50f12f5e54507bf68454e87e006640d500186fe45d6fd04feda548a241b6bd1  /usr/local/share/ca-certificates/corp-root-ca.crt" | sha256sum -c -
 RUN cat /usr/local/share/ca-certificates/corp-root-ca.crt >> /etc/ssl/certs/ca-certificates.crt
 
 # 2) Dépendances mono-repo
@@ -31,6 +32,7 @@ ENV NODE_ENV=production \
 RUN addgroup -g 1001 app && adduser -D -G app -u 1001 app
 
 COPY backend/corp-root-ca.cer /usr/local/share/ca-certificates/
+RUN echo "c50f12f5e54507bf68454e87e006640d500186fe45d6fd04feda548a241b6bd1  /usr/local/share/ca-certificates/corp-root-ca.crt" | sha256sum -c -
 RUN cat /usr/local/share/ca-certificates/corp-root-ca.crt >> /etc/ssl/certs/ca-certificates.crt
 
 COPY --from=build /app/node_modules       /app/node_modules

@@ -29,3 +29,18 @@ weekly and updated promptly when security patches are released.
 ## Validation
 
 This document is intended for peer or security expert review to validate the overall design and proposed protections.
+
+## Software and Data Integrity
+
+To address OWASP A08 risks:
+
+- Dependencies are locked with `package-lock.json` and verified by the CI workflow running `npm audit`.
+- Dockerfiles check the SHA-256 hash of the internal certificate before adding it to the trust store.
+- Any future resources loaded from a CDN must include a Subresource Integrity (`integrity`) attribute, for example:
+
+```html
+<script src="https://cdn.example.com/lib.js"
+        integrity="sha384-..."
+        crossorigin="anonymous"></script>
+```
+- External artifacts such as scripts or archives must have their hash validated before use.

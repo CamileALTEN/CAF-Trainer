@@ -7,6 +7,7 @@ WORKDIR /app
 ENV NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/corp-root-ca.crt
 
 COPY client/corp-root-ca.cer /usr/local/share/ca-certificates/corp-root-ca.crt
+RUN echo "c50f12f5e54507bf68454e87e006640d500186fe45d6fd04feda548a241b6bd1  /usr/local/share/ca-certificates/corp-root-ca.crt" | sha256sum -c -
 RUN cat /usr/local/share/ca-certificates/corp-root-ca.crt >> /etc/ssl/certs/ca-certificates.crt
 
 COPY package*.json ./
