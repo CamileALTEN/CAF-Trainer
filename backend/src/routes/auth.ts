@@ -3,8 +3,11 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { sendMail } from '../utils/mailer';
 import { JWT_SECRET } from '../config/secrets';
+import { verifyTOTP, generateSecret } from '../utils/totp';
+import { authenticate, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -12,13 +15,37 @@ const mailRx = /^[a-z0-9]+(\.[a-z0-9]+)?@alten\.com$/i;
 
 // LOGIN
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body as { username: string; password: string };
+  const { username, password, code } = req.body as { username: string; password: string; code?: string };
   const user = await prisma.user.findUnique({ where: { username } });
   if (!user) return res.status(401).json({ error: 'Identifiants invalides' });
-  if (!bcrypt.compareSync(password, user.password))
+
+  if (user.lockUntil && user.lockUntil > new Date()) {
+    return res.status(403).json({ error: 'Compte verrouillé. Réessayez plus tard' });
+  }
+
+  if (!bcrypt.compareSync(password, user.password)) {
+    const attempts = user.failedAttempts + 1;
+    const data: any = { failedAttempts: attempts };
+    if (attempts >= 5) {
+      data.lockUntil = new Date(Date.now() + 5 * 60 * 1000);
+      data.failedAttempts = 0;
+    }
+    await prisma.user.update({ where: { id: user.id }, data });
     return res.status(401).json({ error: 'Identifiants invalides' });
+  }
+
+  if (user.twoFactorSecret) {
+    if (!code) return res.status(400).json({ error: 'Code 2FA requis' });
+    if (!verifyTOTP(code, user.twoFactorSecret)) {
+      await prisma.user.update({ where: { id: user.id }, data: { failedAttempts: { increment: 1 } } });
+      return res.status(401).json({ error: 'Identifiants invalides' });
+    }
+  }
+
+  await prisma.user.update({ where: { id: user.id }, data: { failedAttempts: 0, lockUntil: null } });
+
   const { id, role, site, tokenVersion } = user;
-  const token = jwt.sign({ id, role, tokenVersion }, JWT_SECRET, { expiresIn: '1h' });
+  const token = jwt.sign({ id, role, tokenVersion }, JWT_SECRET, { expiresIn: '1h', algorithm: 'HS256' });
   res.json({ token, user: { id, username, role, site } });
 });
 
@@ -67,6 +94,26 @@ router.post('/forgot', async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Envoi e-mail impossible' });
   }
+});
+
+// 2FA SETUP
+router.post('/2fa/setup', authenticate, async (req: AuthRequest, res) => {
+  const secret = crypto.randomBytes(20).toString('hex');
+  res.json({ secret });
+});
+
+router.post('/2fa/enable', authenticate, async (req: AuthRequest, res) => {
+  const { secret, code } = req.body as { secret: string; code: string };
+  if (!verifyTOTP(code, secret)) {
+    return res.status(400).json({ error: 'Code invalide' });
+  }
+  await prisma.user.update({ where: { id: req.user!.id }, data: { twoFactorSecret: secret } });
+  res.json({ ok: true });
+});
+
+router.post('/2fa/disable', authenticate, async (req: AuthRequest, res) => {
+  await prisma.user.update({ where: { id: req.user!.id }, data: { twoFactorSecret: null } });
+  res.json({ ok: true });
 });
 
 export default router;

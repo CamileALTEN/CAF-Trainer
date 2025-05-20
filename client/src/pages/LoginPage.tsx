@@ -13,14 +13,18 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
+  const [code,     setCode]     = useState('');
+  const [need2fa,  setNeed2fa]  = useState(false);
 
   /* ───── connexion ───── */
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(''); setLoading(true);
-    const { ok, msg } = await login(username.trim(), password);
+    const { ok, msg, needCode } = await login(username.trim(), password, code);
     setLoading(false);
-    ok ? navigate('/', { replace:true }) : setError(msg || 'Erreur');
+    if (ok) return navigate('/', { replace: true });
+    if (needCode) { setNeed2fa(true); setError(''); return; }
+    setError(msg || 'Erreur');
   };
 
   /* ───── mot de passe oublié ───── */
@@ -59,6 +63,18 @@ export default function LoginPage() {
             required
           />
         </div>
+
+        {need2fa && (
+          <div className="login-field">
+            <label>Code&nbsp;2FA</label>
+            <input
+              value={code}
+              onChange={e => setCode(e.target.value)}
+              placeholder="123456"
+              required
+            />
+          </div>
+        )}
 
         <button type="submit" className="login-submit" disabled={loading}>
           {loading ? '…' : 'Se connecter'}

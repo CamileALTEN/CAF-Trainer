@@ -18,6 +18,9 @@ model User {
   username      String     @unique
   password      String
   tokenVersion  Int        @default(0)
+  failedAttempts Int       @default(0)
+  lockUntil      DateTime?
+  twoFactorSecret String?
   role          Role
   site          String?
   managerId     String?    

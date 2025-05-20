@@ -16,7 +16,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
   }
   const token = header.slice(7);
   try {
-    const payload = jwt.verify(token, JWT_SECRET) as { id: string; role: string; tokenVersion: number };
+    const payload = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] }) as { id: string; role: string; tokenVersion: number };
     const user = await prisma.user.findUnique({ where: { id: payload.id }, select: { tokenVersion: true, role: true } });
     if (!user || user.tokenVersion !== payload.tokenVersion) {
       return res.status(401).json({ error: 'Token révoqué' });

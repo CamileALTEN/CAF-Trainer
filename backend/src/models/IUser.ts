@@ -8,6 +8,9 @@ export interface IUser {
     username:  string;
     password:  string;
     tokenVersion: number;
+    failedAttempts: number;
+    lockUntil?: Date;
+    twoFactorSecret?: string;
     role:      Role;   // ← manager ajouté
     site?:     string;           // pour les CAF
     managerId?: string;          // CAF ➟ manager référent
