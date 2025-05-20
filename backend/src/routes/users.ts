@@ -87,10 +87,17 @@ router.patch('/:id/password', authorize('admin', 'manager', 'caf', 'user'), asyn
 
 // PATCH general
 router.patch('/:id', authorize('admin', 'manager', 'caf', 'user'), async (req: AuthRequest, res, next) => {
-  const data = req.body as any;
+  const data = { ...req.body } as any;
   if (data.username && !mailRx.test(data.username)) {
     return res.status(400).json({ error: 'Username invalide' });
   }
+
+  // Non-admin users cannot escalate privileges
+  if (req.user?.role !== 'admin') {
+    delete data.role;
+    delete data.managerId;
+  }
+  delete data.password; // mot de passe via route dédiée
 
   try {
     if (req.user?.role !== 'admin' && req.user?.id !== req.params.id) {

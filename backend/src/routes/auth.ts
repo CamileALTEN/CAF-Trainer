@@ -24,11 +24,13 @@ router.post('/login', async (req, res) => {
 
 // REGISTER
 router.post('/register', async (req, res) => {
-  const { username, password, role, site, managerId } = req.body as any;
-  if (!username || !password || !role)
+  const { username, password, role = 'caf', site, managerId } = req.body as any;
+  if (!username || !password)
     return res.status(400).json({ error: 'Champs manquants' });
   if (!mailRx.test(username))
     return res.status(400).json({ error: 'Format attendu: prenom.nom@alten.com' });
+  if (role !== 'caf')
+    return res.status(403).json({ error: 'Role interdit' });
   const exists = await prisma.user.findUnique({ where: { username } });
   if (exists) return res.status(409).json({ error: 'Nom déjà pris' });
   const id = Date.now().toString();
