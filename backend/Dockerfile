@@ -28,6 +28,7 @@ FROM node:20-alpine
 WORKDIR /app/backend
 ENV NODE_ENV=production \
     NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/corp-root-ca.crt
+RUN addgroup -g 1001 app && adduser -D -G app -u 1001 app
 
 COPY backend/corp-root-ca.cer /usr/local/share/ca-certificates/
 RUN cat /usr/local/share/ca-certificates/corp-root-ca.crt >> /etc/ssl/certs/ca-certificates.crt
@@ -35,6 +36,8 @@ RUN cat /usr/local/share/ca-certificates/corp-root-ca.crt >> /etc/ssl/certs/ca-c
 COPY --from=build /app/node_modules       /app/node_modules
 COPY --from=build /app/backend/build      ./build
 COPY --from=build /app/backend/prisma     ./prisma
+
+USER app
 
 EXPOSE 5000
 CMD ["node", "build/index.js"]

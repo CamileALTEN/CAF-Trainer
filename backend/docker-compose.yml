@@ -9,8 +9,8 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: camile
-      POSTGRES_PASSWORD: caftrainer2025
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: caf_trainer
     volumes:
       - pgdata:/var/lib/postgresql/data

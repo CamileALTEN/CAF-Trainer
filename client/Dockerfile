@@ -19,12 +19,15 @@ RUN npm run build
 ### Étape 2 : image Nginx ##################################
 FROM nginx:1.25-alpine
 WORKDIR /usr/share/nginx/html
+RUN addgroup -g 1001 app && adduser -D -G app -u 1001 app
 
 # Copie du build CRA
-COPY --from=build /app/client/build ./        
+COPY --from=build /app/client/build ./
 
 # Conf SPA + proxy API
 COPY client/nginx.conf /etc/nginx/conf.d/default.conf
+
+USER app
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

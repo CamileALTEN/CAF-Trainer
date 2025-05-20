@@ -20,6 +20,9 @@ RUN npm ci --workspaces --include-workspace-root=false --workspace client
 COPY client ./client
 WORKDIR /app/client
 
+RUN addgroup -g 1001 app && adduser -D -G app -u 1001 app
+USER app
+
 # CRA lance automatiquement le serveur dev sur 3000
 CMD ["npm", "start"]
 

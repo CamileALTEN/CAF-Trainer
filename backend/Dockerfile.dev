@@ -20,11 +20,13 @@ RUN npm ci --workspaces --include-workspace-root=false --workspace backend
 COPY backend ./backend
 
 WORKDIR /app/backend
-RUN npx prisma generate                     
+RUN npx prisma generate
 
 # 4) Hot-reload
 WORKDIR /app/backend
 RUN npm i -D ts-node-dev
+RUN addgroup -g 1001 app && adduser -D -G app -u 1001 app
+USER app
 CMD ["npm", "run", "dev"]
 
 EXPOSE 5000

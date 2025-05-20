@@ -21,6 +21,8 @@ import { errorHandler } from './middleware/errorHandler';
 import '../config/secrets';
 
 const app = express();
+// Désactive l'en-tête X-Powered-By pour ne pas révéler la version d'Express
+app.disable('x-powered-by');
 const {
   NODE_ENV = 'development',
   PORT = 5000,
@@ -36,7 +38,20 @@ app.use(
     credentials: true,
   })
 );
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+      },
+    },
+  })
+);
+app.use(helmet.frameguard({ action: 'deny' }));
+app.use(helmet.noSniff());
+app.use(helmet.referrerPolicy({ policy: 'no-referrer' }));
 app.use(express.json());
 app.use(requestLogger);
 
