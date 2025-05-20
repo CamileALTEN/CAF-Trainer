@@ -5,3 +5,4 @@ backend/.env
 backup.sql
 nom-de-domaine.txt
 backend/logs/
+sbom.json

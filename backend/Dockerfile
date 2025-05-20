@@ -2,7 +2,7 @@
 # CAF-Trainer • backend • Dockerfile (production)
 ############################################################
 # ── Étape 1 : build ───────────────────────────────────────
-FROM node:20-alpine AS build
+FROM node:20.11-alpine AS build
 WORKDIR /app
 ENV NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/corp-root-ca.crt
 
@@ -24,7 +24,7 @@ RUN npx prisma generate
 RUN npm run build                          
 
 # ── Étape 2 : runtime léger ────────────────
-FROM node:20-alpine
+FROM node:20.11-alpine
 WORKDIR /app/backend
 ENV NODE_ENV=production \
     NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/corp-root-ca.crt

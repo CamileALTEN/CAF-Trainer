@@ -2,7 +2,7 @@
 # CAF-Trainer • client • Dockerfile (production)
 ############################################################
 ### Étape 1 : build CRA ####################################
-FROM node:20-alpine AS build
+FROM node:20.11-alpine AS build
 WORKDIR /app
 ENV NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/corp-root-ca.crt
 
@@ -17,7 +17,7 @@ COPY client ./client
 WORKDIR /app/client
 RUN npm run build                   
 ### Étape 2 : image Nginx ##################################
-FROM nginx:1.25-alpine
+FROM nginx:1.25.2-alpine
 WORKDIR /usr/share/nginx/html
 RUN addgroup -g 1001 app && adduser -D -G app -u 1001 app
 

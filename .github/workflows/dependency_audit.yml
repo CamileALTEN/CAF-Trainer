@@ -1,0 +1,32 @@
+name: Dependency Audit
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  npm-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci --workspaces
+      - name: Audit root
+        run: npm audit --production
+      - name: Audit backend
+        run: npm audit --prefix backend --production
+      - name: Audit client
+        run: npm audit --prefix client --production
+      - name: Generate SBOM
+        run: npm run generate:sbom
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v3
+        with:
+          name: sbom
+          path: sbom.json

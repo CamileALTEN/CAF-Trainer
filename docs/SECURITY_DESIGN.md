@@ -16,6 +16,16 @@ Secrets are loaded from environment variables using `dotenv` and validated on st
 - **Logging and Audit**: a winston based logger records HTTP requests and errors to a log file.
 - **Revocation**: JWT tokens include a `tokenVersion` checked against the database to allow revocation.
 
+## Dependency Management
+
+The project relies on third‑party packages that must be kept up to date to
+avoid known vulnerabilities. Updates are tracked automatically by GitHub
+Dependabot for all workspaces and GitHub Actions. Every pull request triggers a
+`npm audit` workflow which fails the build if high or critical issues are
+reported. A Software Bill of Materials (SBOM) can be generated with
+`npm run generate:sbom` to inventory components. Dependencies should be reviewed
+weekly and updated promptly when security patches are released.
+
 ## Validation
 
 This document is intended for peer or security expert review to validate the overall design and proposed protections.

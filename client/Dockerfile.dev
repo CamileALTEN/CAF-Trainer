@@ -1,7 +1,7 @@
 ############################################################
 # CAF-Trainer • client • Dockerfile.dev (CRA + hot-reload)
 ############################################################
-FROM node:20-alpine
+FROM node:20.11-alpine
 WORKDIR /app
 ENV NODE_ENV=development \
     CHOKIDAR_USEPOLLING=true \

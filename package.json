@@ -1,25 +1,26 @@
 {
-    "name": "caf-trainer-ts",
-    "version": "1.0.0",
-    "private": true,
-    "workspaces": [
+  "name": "caf-trainer-ts",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
     "backend",
     "client"
-    ],
-    "scripts": {
+  ],
+  "scripts": {
     "start:backend": "npm --workspace backend start",
     "start:client": "npm --workspace client start",
-    "start": "concurrently \"npm run start:backend\" \"npm run start:client\""
-    },
-    "devDependencies": {
+    "start": "concurrently \"npm run start:backend\" \"npm run start:client\"",
+    "generate:sbom": "npx cyclonedx-bom -o sbom.json"
+  },
+  "devDependencies": {
     "@types/nodemailer": "^6.4.17",
     "@types/react": "^18.3.21",
     "@types/react-dom": "^18.3.7",
     "concurrently": "^9.1.2",
     "vite": "^6.3.5"
-    },
-    "dependencies": {
+  },
+  "dependencies": {
     "quill": "^2.0.3",
     "react-quill": "^2.0.0"
-    }
-    }
+  }
+}
