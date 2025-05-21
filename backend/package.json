@@ -24,7 +24,8 @@
         "prisma": "^6.8.1",
         "winston": "^3.10.0",
         "winston-daily-rotate-file": "^4.7.1",
-        "winston-syslog": "^2.5.0"
+        "winston-syslog": "^2.5.0",
+        "openid-client": "^6.1.0"
     },
     "devDependencies": {
         "@types/bcrypt": "^5.0.2",
