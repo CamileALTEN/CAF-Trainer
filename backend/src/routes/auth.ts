@@ -5,7 +5,16 @@ import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { sendMail } from '../utils/mailer';
-import { JWT_SECRET } from '../config/secrets';
+import {
+  JWT_SECRET,
+  SSO_CLIENT_ID,
+  SSO_CLIENT_SECRET,
+  SSO_ISSUER,
+  SSO_REDIRECT_URI,
+  SSO_ADMIN_GROUP,
+  SSO_MANAGER_GROUP,
+} from '../config/secrets';
+import { Issuer, generators, Client } from 'openid-client';
 import { verifyTOTP, generateSecret } from '../utils/totp';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { logger } from '../middleware/logger';
@@ -13,6 +22,24 @@ import { logger } from '../middleware/logger';
 const router = Router();
 const prisma = new PrismaClient();
 const mailRx = /^[a-z0-9]+(\.[a-z0-9]+)?@alten\.com$/i;
+
+let oidcClientPromise: Promise<Client> | null = null;
+const authStates = new Map<string, string>();
+
+async function getOidcClient(): Promise<Client> {
+  if (!oidcClientPromise) {
+    oidcClientPromise = Issuer.discover(SSO_ISSUER).then(
+      issuer =>
+        new issuer.Client({
+          client_id: SSO_CLIENT_ID,
+          client_secret: SSO_CLIENT_SECRET,
+          redirect_uris: [SSO_REDIRECT_URI],
+          response_types: ['code'],
+        })
+    );
+  }
+  return oidcClientPromise;
+}
 
 const failures = new Map<string, { count: number; timer: NodeJS.Timeout }>();
 
@@ -35,6 +62,73 @@ function recordFailure(username: string, ip: string) {
     }
   }
 }
+
+// ----- SSO -----
+router.get('/sso/login', async (_req, res) => {
+  const client = await getOidcClient();
+  const state = generators.state();
+  const nonce = generators.nonce();
+  authStates.set(state, nonce);
+  const url = client.authorizationUrl({
+    scope: 'openid profile email groups',
+    state,
+    nonce,
+  });
+  res.redirect(url);
+});
+
+router.get('/sso/callback', async (req, res, next) => {
+  try {
+    const client = await getOidcClient();
+    const params = client.callbackParams(req);
+    const nonce = authStates.get(params.state as string);
+    authStates.delete(params.state as string);
+    const tokenSet = await client.callback(SSO_REDIRECT_URI, params, {
+      state: params.state as string,
+      nonce,
+    });
+    const claims = tokenSet.claims();
+    const email = claims.email || claims.preferred_username;
+    const groups: string[] = claims.groups || [];
+    if (!email) return res.status(400).send('Email manquant');
+
+    let role: 'caf' | 'manager' | 'admin' = 'caf';
+    if (SSO_ADMIN_GROUP && groups.includes(SSO_ADMIN_GROUP)) role = 'admin';
+    else if (SSO_MANAGER_GROUP && groups.includes(SSO_MANAGER_GROUP)) role = 'manager';
+
+    let user = await prisma.user.findUnique({ where: { username: email } });
+    if (!user) {
+      user = await prisma.user.create({
+        data: { id: Date.now().toString(), username: email, password: '', role },
+      });
+    } else if (user.role !== role) {
+      await prisma.user.update({ where: { id: user.id }, data: { role } });
+      user.role = role;
+    }
+
+    const { id, site, tokenVersion } = user;
+    const token = jwt.sign({ id, role, tokenVersion }, JWT_SECRET, {
+      expiresIn: '1h',
+      algorithm: 'HS256',
+    });
+
+    const payload = Buffer.from(
+      JSON.stringify({ id, username: email, role, site })
+    ).toString('base64');
+
+    const origin = process.env.ALLOWED_ORIGIN || 'http://localhost:3000';
+    res.send(
+      `<script>\n` +
+        `const u = JSON.parse(atob('${payload}'));\n` +
+        `sessionStorage.setItem('caf-token','${token}');\n` +
+        `sessionStorage.setItem('caf-user',JSON.stringify(u));\n` +
+        `window.location='${origin}';\n` +
+        `</script>`
+    );
+  } catch (err) {
+    next(err);
+  }
+});
 
 // LOGIN
 router.post('/login', async (req, res) => {

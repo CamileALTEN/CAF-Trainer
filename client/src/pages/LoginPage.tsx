@@ -80,6 +80,15 @@ export default function LoginPage() {
           {loading ? '…' : 'Se connecter'}
         </button>
 
+        <button
+          type="button"
+          className="login-submit"
+          style={{ marginTop: '0.5rem' }}
+          onClick={() => (window.location.href = '/api/auth/sso/login')}
+        >
+          Connexion SSO
+        </button>
+
         {error && <div className="login-error">{error}</div>}
 
         <div style={{ marginTop:'1rem' }}>
