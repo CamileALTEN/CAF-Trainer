@@ -14,53 +14,53 @@ enum Role {
 }
 
 model User {
-  id            String     @id
-  username      String     @unique
-  password      String
-  tokenVersion  Int        @default(0)
-  failedAttempts Int       @default(0)
-  lockUntil      DateTime?
+  id              String         @id
+  username        String         @unique
+  password        String
+  tokenVersion    Int            @default(0)
+  failedAttempts  Int            @default(0)
+  lockUntil       DateTime?
   twoFactorSecret String?
-  role          Role
-  site          String?
-  managerId     String?    
-  manager       User?      @relation("UserManager", fields: [managerId], references: [id])
-  subordinates  User[]     @relation("UserManager")
-  notifications Notification[]
-  progress      Progress[]
+  role            Role
+  site            String?
+  managerId       String?
+  manager         User?          @relation("UserManager", fields: [managerId], references: [id])
+  subordinates    User[]         @relation("UserManager")
+  notifications   Notification[]
+  progress        Progress[]
 }
 
 model Module {
-  id          String    @id
+  id          String     @id
   title       String
-  description String?   
+  description String?
   summary     String?
   enabled     Boolean
   items       Item[]
-  progress    Progress[] 
+  progress    Progress[]
 }
 
 model Item {
-  id             String         @id
-  title          String
-  subtitle       String?
-  content        String?
-  enabled        Boolean
-  module         Module         @relation(fields: [moduleId], references: [id])
-  moduleId       String
-  parentItemId   String?        
-  parentItem     Item?          @relation("ItemChildren", fields: [parentItemId], references: [id])
-  children       Item[]         @relation("ItemChildren")
-  links          ItemLink[]
-  images         ItemImage[]
-  videos         ItemVideo[]
-  profiles       ItemProfile[]
-  visitedItems   VisitedItem[]
+  id           String        @id
+  title        String
+  subtitle     String?
+  content      String?
+  enabled      Boolean
+  module       Module        @relation(fields: [moduleId], references: [id])
+  moduleId     String
+  parentItemId String?
+  parentItem   Item?         @relation("ItemChildren", fields: [parentItemId], references: [id])
+  children     Item[]        @relation("ItemChildren")
+  links        ItemLink[]
+  images       ItemImage[]
+  videos       ItemVideo[]
+  profiles     ItemProfile[]
+  visitedItems VisitedItem[]
 }
 
 model ItemLink {
-  id     Int    @id @default(autoincrement())
-  item   Item   @relation(fields: [itemId], references: [id])
+  id     Int     @id @default(autoincrement())
+  item   Item    @relation(fields: [itemId], references: [id])
   itemId String
   title  String?
   url    String
@@ -68,26 +68,27 @@ model ItemLink {
 }
 
 model ItemImage {
-  id      Int    @id @default(autoincrement())
-  item    Item   @relation(fields: [itemId], references: [id])
-  itemId  String
-  src     String
-  width   Int?
-  align   String?
+  id     Int     @id @default(autoincrement())
+  item   Item    @relation(fields: [itemId], references: [id])
+  itemId String
+  src    String
+  width  Int?
+  align  String?
 }
 
 model ItemVideo {
-  id      Int    @id @default(autoincrement())
-  item    Item   @relation(fields: [itemId], references: [id])
-  itemId  String
-  src     String
-  label   String?
+  id     Int     @id @default(autoincrement())
+  item   Item    @relation(fields: [itemId], references: [id])
+  itemId String
+  src    String
+  label  String?
 }
 
 model ItemProfile {
-  item     Item   @relation(fields: [itemId], references: [id])
-  itemId   String
-  profile  String
+  item    Item   @relation(fields: [itemId], references: [id])
+  itemId  String
+  profile String
+
   @@id([itemId, profile])
 }
 
@@ -109,9 +110,10 @@ model Progress {
 }
 
 model VisitedItem {
-  progress    Progress  @relation(fields: [progressId], references: [id])
-  progressId  Int
-  item        Item      @relation(fields: [itemId], references: [id])
-  itemId      String
+  progress   Progress @relation(fields: [progressId], references: [id])
+  progressId Int
+  item       Item     @relation(fields: [itemId], references: [id])
+  itemId     String
+
   @@id([progressId, itemId])
 }
